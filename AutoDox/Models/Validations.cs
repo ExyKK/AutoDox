@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows.Controls;
 
-namespace AutoDox.Models
+namespace AutoDox.UI.Models
 {
     internal class DestinationDirValidationRule : ValidationRule
     {

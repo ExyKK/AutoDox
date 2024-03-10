@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace AutoDox.Core
+namespace AutoDox.UI.Core
 {
     internal class ObservableObject : INotifyPropertyChanged
     {

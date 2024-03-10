@@ -1,9 +1,9 @@
-﻿using AutoDox.Core;
-using AutoDox.Models;
+﻿using AutoDox.UI.Core;
+using AutoDox.UI.Models;
 using HandyControl.Themes;
 using System;
 
-namespace AutoDox.ViewModels
+namespace AutoDox.UI.ViewModels
 {
     class HomeViewModel : ObservableObject
     {
@@ -11,7 +11,7 @@ namespace AutoDox.ViewModels
         public RelayCommand ReadFromDeviceCommand { get; set; }
         public RelayCommand ReadGitHubCommand { get; set; }
 
-        private DiagramGenerator _diagramGenerator;
+        private DiagramGeneratorManager _diagramGenerator;
         private ExplorerDialog _explorerDialog;
 
         private object _destinationDirectory;
@@ -40,7 +40,7 @@ namespace AutoDox.ViewModels
         public HomeViewModel() 
         {
             _explorerDialog = new ExplorerDialog();
-            _diagramGenerator = new DiagramGenerator();
+            _diagramGenerator = new DiagramGeneratorManager();
 
             if (ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light)
                 SvgColor = "#000000";

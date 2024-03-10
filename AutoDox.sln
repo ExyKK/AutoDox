@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34601.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoDox", "AutoDox\AutoDox.csproj", "{FB2289F4-1CBC-4F83-A29F-063905E339C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoDox.UI", "AutoDox\AutoDox.UI.csproj", "{FB2289F4-1CBC-4F83-A29F-063905E339C5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1A6F8E7-26C7-4A27-81A5-9AA85B660370} = {B1A6F8E7-26C7-4A27-81A5-9AA85B660370}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoDox.DiagramGenerator.Attributes", "AutoDox.DiagramGenerator.Attributes\AutoDox.DiagramGenerator.Attributes.csproj", "{C4C721D5-F861-45D9-9A6B-0AC13805397C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoDox.DiagramGenerator.Library", "AutoDox.DiagramGenerator.Library\AutoDox.DiagramGenerator.Library.csproj", "{B1A6F8E7-26C7-4A27-81A5-9AA85B660370}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C4C721D5-F861-45D9-9A6B-0AC13805397C} = {C4C721D5-F861-45D9-9A6B-0AC13805397C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +25,14 @@ Global
 		{FB2289F4-1CBC-4F83-A29F-063905E339C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB2289F4-1CBC-4F83-A29F-063905E339C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB2289F4-1CBC-4F83-A29F-063905E339C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4C721D5-F861-45D9-9A6B-0AC13805397C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4C721D5-F861-45D9-9A6B-0AC13805397C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4C721D5-F861-45D9-9A6B-0AC13805397C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4C721D5-F861-45D9-9A6B-0AC13805397C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1A6F8E7-26C7-4A27-81A5-9AA85B660370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A6F8E7-26C7-4A27-81A5-9AA85B660370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A6F8E7-26C7-4A27-81A5-9AA85B660370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A6F8E7-26C7-4A27-81A5-9AA85B660370}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AutoDox.Views
+namespace AutoDox.UI.Views
 {
     public partial class HomeView : UserControl
     {

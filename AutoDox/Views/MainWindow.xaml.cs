@@ -1,4 +1,4 @@
-﻿namespace AutoDox
+﻿namespace AutoDox.UI
 {
     public partial class MainWindow
     {

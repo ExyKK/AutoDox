@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 
-namespace AutoDox.Models
+namespace AutoDox.UI.Models
 {
     class ExplorerDialog
     {

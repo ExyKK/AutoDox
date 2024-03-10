@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace AutoDox.Core
+namespace AutoDox.UI.Core
 {
     internal class RelayCommand : ICommand
     {

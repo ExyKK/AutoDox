@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoDox.ViewModels
+namespace AutoDox.UI.ViewModels
 {
     class SettingsViewModel
     {

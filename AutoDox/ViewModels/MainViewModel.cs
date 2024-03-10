@@ -1,8 +1,7 @@
-﻿using AutoDox.Core;
+﻿using AutoDox.UI.Core;
 using HandyControl.Themes;
-using System.Windows;
 
-namespace AutoDox.ViewModels
+namespace AutoDox.UI.ViewModels
 {
     class MainViewModel : ObservableObject
     {
@@ -45,12 +44,12 @@ namespace AutoDox.ViewModels
             {
                 if (ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light)
                 {
-                    ((App)Application.Current).UpdateTheme(ApplicationTheme.Dark);
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
                     HomeViewModel.SvgColor = "#FFFFFF";
                 }
                 else
                 {
-                    ((App)Application.Current).UpdateTheme(ApplicationTheme.Light);
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
                     HomeViewModel.SvgColor = "#000000";
                 }
             });

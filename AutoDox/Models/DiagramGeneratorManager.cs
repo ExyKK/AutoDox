@@ -3,9 +3,9 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 
-namespace AutoDox.Models
+namespace AutoDox.UI.Models
 {
-    class DiagramGenerator
+    class DiagramGeneratorManager
     {
         ExplorerDialog explorer;
         string destinationDirectory;
