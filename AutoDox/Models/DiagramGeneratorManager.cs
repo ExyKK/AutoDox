@@ -7,7 +7,6 @@ namespace AutoDox.UI.Models
 {
     class DiagramGeneratorManager
     {
-        ExplorerDialog explorer;
         string destinationDirectory;
         string[] sourceFiles;
         string[] pumlFiles;
@@ -16,8 +15,7 @@ namespace AutoDox.UI.Models
         {
             this.destinationDirectory = (string)destinationDirectory;
 
-            explorer = new ExplorerDialog();
-            sourceFiles = explorer.SelectFiles();
+            sourceFiles = ExplorerDialog.SelectFiles();
 
             // scan source files, create .puml`s
 
@@ -92,7 +90,7 @@ namespace AutoDox.UI.Models
         //{
         //    RequestManager manager = RequestManager.Get();
         //    RequestManager.Response response = await manager.SendRequest(MakeAbsolute(target), method, body);
-            
+
         //    string contentOutput = response.content;
         //    Write(contentOutput);
 

@@ -48,13 +48,22 @@
                          Content="Home"
                          IsChecked="True"
                          Width="180"
-                         Height="50"/>
+                         Height="50"
+                         FontSize="14"/>
+            <RadioButton BorderThickness="0" 
+                         Style="{StaticResource RadioButtonIcon}"
+                         Command="{Binding ConfigurationViewCommand}"
+                         Content="Configuration"
+                         Width="180"
+                         Height="50"
+                         FontSize="14"/>
             <RadioButton BorderThickness="0" 
                          Style="{StaticResource RadioButtonIcon}"
                          Command="{Binding SettingsViewCommand}"
                          Content="Settings"
                          Width="180"
-                         Height="50"/>
+                         Height="50"
+                         FontSize="14"/>
         </StackPanel>
 
         <ContentControl Grid.RowSpan="2"

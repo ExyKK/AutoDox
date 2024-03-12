@@ -4,7 +4,7 @@ namespace AutoDox.UI.Models
 {
     class ExplorerDialog
     {
-        public string SelectFolder()
+        public static string SelectFolder()
         {
             OpenFolderDialog dialog = new();
 
@@ -15,7 +15,7 @@ namespace AutoDox.UI.Models
             return null;
         }
 
-        public string[] SelectFiles()
+        public static string[] SelectFiles()
         {
             OpenFileDialog dialog = new() { Multiselect = true };
 

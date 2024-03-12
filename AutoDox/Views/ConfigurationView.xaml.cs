@@ -2,9 +2,9 @@
 
 namespace AutoDox.UI.Views
 {
-    public partial class SettingsView : UserControl
+    public partial class ConfigurationView : UserControl
     {
-        public SettingsView()
+        public ConfigurationView()
         {
             InitializeComponent();
         }

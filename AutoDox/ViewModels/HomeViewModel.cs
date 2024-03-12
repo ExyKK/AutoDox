@@ -1,6 +1,5 @@
 ﻿using AutoDox.UI.Core;
 using AutoDox.UI.Models;
-using HandyControl.Themes;
 using System;
 
 namespace AutoDox.UI.ViewModels
@@ -12,16 +11,16 @@ namespace AutoDox.UI.ViewModels
         public RelayCommand ReadGitHubCommand { get; set; }
 
         private DiagramGeneratorManager _diagramGenerator;
-        private ExplorerDialog _explorerDialog;
 
-        private object _destinationDirectory;
-        public object DestinationDirectory
+        public static event EventHandler DestinationDirectoryChanged;
+        private static object _destinationDirectory;
+        public static object DestinationDirectory
         {
             get { return _destinationDirectory; }
             set
             {
                 _destinationDirectory = value;
-                OnPropertyChanged();
+                DestinationDirectoryChanged?.Invoke(null, EventArgs.Empty);
             }
         }
 
@@ -39,17 +38,13 @@ namespace AutoDox.UI.ViewModels
 
         public HomeViewModel() 
         {
-            _explorerDialog = new ExplorerDialog();
             _diagramGenerator = new DiagramGeneratorManager();
 
-            if (ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light)
-                SvgColor = "#000000";
-            else
-                SvgColor = "#FFFFFF";
+            SvgColor = ThemeChanger.GetSvgColor();
 
             BrowseDestinationDirectoryCommand = new RelayCommand(obj =>
             {
-                DestinationDirectory = _explorerDialog.SelectFolder();
+                DestinationDirectory = ExplorerDialog.SelectFolder();
             });
 
             ReadFromDeviceCommand = new RelayCommand(obj =>

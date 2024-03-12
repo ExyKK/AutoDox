@@ -16,6 +16,10 @@
                 <views:HomeView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModels:ConfigurationViewModel}">
+                <views:ConfigurationView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
                 <views:SettingsView/>
             </DataTemplate>

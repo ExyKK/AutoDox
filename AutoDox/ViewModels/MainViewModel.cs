@@ -1,15 +1,16 @@
 ﻿using AutoDox.UI.Core;
-using HandyControl.Themes;
 
 namespace AutoDox.UI.ViewModels
 {
     class MainViewModel : ObservableObject
     {
         public RelayCommand HomeViewCommand { get; set; }
+        public RelayCommand ConfigurationViewCommand { get; set; }
         public RelayCommand SettingsViewCommand { get; set; }
         public RelayCommand ChangeThemeCommand { get; set; }
 
         public HomeViewModel HomeVM { get; set; }
+        public ConfigurationViewModel ConfigurationVM { get; set; }
         public SettingsViewModel SettingsVM { get; set; }
 
         private object _currentView;
@@ -26,6 +27,7 @@ namespace AutoDox.UI.ViewModels
         public MainViewModel() 
         {
             HomeVM = new HomeViewModel();
+            ConfigurationVM = new ConfigurationViewModel();
             SettingsVM = new SettingsViewModel();
 
             CurrentView = HomeVM;
@@ -35,6 +37,11 @@ namespace AutoDox.UI.ViewModels
                 CurrentView = HomeVM;
             });
 
+            ConfigurationViewCommand = new RelayCommand(obj =>
+            {
+                CurrentView = ConfigurationVM;
+            });
+
             SettingsViewCommand = new RelayCommand(obj =>
             {
                 CurrentView = SettingsVM;
@@ -42,16 +49,7 @@ namespace AutoDox.UI.ViewModels
 
             ChangeThemeCommand = new RelayCommand(obj =>
             {
-                if (ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light)
-                {
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                    HomeViewModel.SvgColor = "#FFFFFF";
-                }
-                else
-                {
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                    HomeViewModel.SvgColor = "#000000";
-                }
+                ThemeChanger.Change();
             });
         }
     }

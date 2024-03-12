@@ -1,36 +1,47 @@
 ﻿<UserControl x:Class="AutoDox.UI.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
+             xmlns:core="clr-namespace:AutoDox.UI.Core"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="375" d:DesignWidth="610">
+             d:DesignHeight="425" d:DesignWidth="610">
     <UserControl.DataContext>
         <viewModels:SettingsViewModel/>
     </UserControl.DataContext>
-    
-    <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="55"/>
-                <RowDefinition/>
-                <RowDefinition Height="55"/>
-            </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="305"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+    <UserControl.Resources>
+        <core:Converter x:Key="converter"/>
+    </UserControl.Resources>
 
-            <StackPanel Grid.Row="1">
-                <TextBlock Text="Settings"
-                   VerticalAlignment="Top"
-                   HorizontalAlignment="Center"
-                   Foreground="{DynamicResource PrimaryTextBrush}"
-                   FontSize="16"/>
+    <hc:ScrollViewer VerticalScrollBarVisibility="Auto" 
+                     IsInertiaEnabled="True">
+        <StackPanel>
+            <StackPanel>
+                <TextBlock Text="Application theme"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           Margin="10,0,0,0"/>
+                <RadioButton HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Content="Light"
+                             IsChecked="{Binding Theme, Converter={StaticResource converter}, ConverterParameter=Light}"
+                             Command="{Binding ChangeThemeCommand}"/>
+                <RadioButton HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Content="Dark"
+                             IsChecked="{Binding Theme, Converter={StaticResource converter}, ConverterParameter=Dark}"
+                             Command="{Binding ChangeThemeCommand}"/>
             </StackPanel>
-        </Grid>
-    </Grid>
+
+            <hc:ComboBox ItemsSource="{Binding DataList}"
+                         Width="265"
+                         Margin="0,10,0,0"
+                         HorizontalAlignment="Left"
+                         IsEditable="False" 
+                         hc:InfoElement.Title="Language"/>
+        </StackPanel>
+    </hc:ScrollViewer>
 </UserControl>
