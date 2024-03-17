@@ -1,7 +1,7 @@
 ﻿using AutoDox.UI.ViewModels;
 using HandyControl.Themes;
 
-namespace AutoDox.UI.Core
+namespace AutoDox.UI.Helpers
 {
     internal class ThemeChanger
     {
@@ -28,7 +28,7 @@ namespace AutoDox.UI.Core
 
         public static string GetSvgColor()
         {
-            return (ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light) ? "#000000" : "#FFFFFF";
+            return ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light ? "#000000" : "#FFFFFF";
         }
     }
 }

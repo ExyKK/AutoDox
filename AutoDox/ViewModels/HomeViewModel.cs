@@ -1,4 +1,5 @@
-﻿using AutoDox.UI.Core;
+﻿using AutoDox.UI.Helpers;
+using AutoDox.UI.Core;
 using AutoDox.UI.Models;
 using System;
 
@@ -6,27 +7,27 @@ namespace AutoDox.UI.ViewModels
 {
     class HomeViewModel : ObservableObject
     {
+        private string _destinationDirectory;
+        private static string _svgColor;
+        private DiagramGeneratorManager _diagramGenerator;
+
         public RelayCommand BrowseDestinationDirectoryCommand { get; set; }
         public RelayCommand ReadFromDeviceCommand { get; set; }
         public RelayCommand ReadGitHubCommand { get; set; }
 
-        private DiagramGeneratorManager _diagramGenerator;
-
-        public static event EventHandler DestinationDirectoryChanged;
-        private static object _destinationDirectory;
-        public static object DestinationDirectory
+        public string DestinationDirectory
         {
             get { return _destinationDirectory; }
             set
             {
                 _destinationDirectory = value;
-                DestinationDirectoryChanged?.Invoke(null, EventArgs.Empty);
+                ConfigurationManager.SetDestinationDirectory(value);
+                OnPropertyChanged();
             }
         }
 
         public static event EventHandler SvgColorChanged;
-        private static object _svgColor;
-        public static object SvgColor
+        public static string SvgColor
         {
             get { return _svgColor; }
             set
@@ -40,6 +41,7 @@ namespace AutoDox.UI.ViewModels
         {
             _diagramGenerator = new DiagramGeneratorManager();
 
+            DestinationDirectory = ConfigurationManager.GetDestinationDirectory();
             SvgColor = ThemeChanger.GetSvgColor();
 
             BrowseDestinationDirectoryCommand = new RelayCommand(obj =>
@@ -51,13 +53,13 @@ namespace AutoDox.UI.ViewModels
             {
                 _diagramGenerator.Run(DestinationDirectory);
             },
-            (obj) => !string.IsNullOrEmpty((string)DestinationDirectory));
+            (obj) => !string.IsNullOrEmpty(DestinationDirectory));
 
             ReadGitHubCommand = new RelayCommand(obj =>
             {
                 
             },
-            (obj) => !string.IsNullOrEmpty((string)DestinationDirectory));
+            (obj) => !string.IsNullOrEmpty(DestinationDirectory));
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows.Controls;
 
-namespace AutoDox.UI.Models
+namespace AutoDox.UI.Helpers
 {
     internal class DestinationDirValidationRule : ValidationRule
     {
@@ -12,7 +12,7 @@ namespace AutoDox.UI.Models
             {
                 return new ValidationResult(false, "Please enter a path to existing directory");
             }
-            return ValidationResult.ValidResult;          
+            return ValidationResult.ValidResult;
         }
     }
 }

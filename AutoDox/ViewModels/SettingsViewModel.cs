@@ -1,13 +1,16 @@
-﻿using AutoDox.UI.Core;
+﻿using AutoDox.UI.Helpers;
+using AutoDox.UI.Core;
 using System;
 
 namespace AutoDox.UI.ViewModels
 {
     class SettingsViewModel : ObservableObject
     {
+        private object _language;
+        private static string _theme;
+
         public RelayCommand ChangeThemeCommand { get; set; }
 
-        private object _language;
         public object Language
         {
             get { return _language; }
@@ -19,7 +22,6 @@ namespace AutoDox.UI.ViewModels
         }
 
         public static event EventHandler ThemeChanged;
-        private static string _theme;
         public static string Theme
         {
             get { return _theme; }

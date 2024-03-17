@@ -5,25 +5,33 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
-             xmlns:models="clr-namespace:AutoDox.UI.Models"
              mc:Ignorable="d" 
              d:DesignHeight="425" d:DesignWidth="610">
     <UserControl.DataContext>
         <viewModels:ConfigurationViewModel/>
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <helpers:StringToBoolConverter x:Key="stringConverter"/>
+        <helpers:InverseBoolConverter x:Key="inverseConverter"/>
+        <helpers:StringListToBoolConverter x:Key="stringListConverter"/>
+    </UserControl.Resources>
+
     <hc:ScrollViewer VerticalScrollBarVisibility="Auto" 
                      IsInertiaEnabled="True">
         <StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Width="320">
                 <hc:TextBox x:Name="destinationDirTextBox"
                             Width="265"
                             hc:InfoElement.Title="Destination directory">
                     <hc:TextBox.Text>
                         <Binding Path="DestinationDirectory" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <models:DestinationDirValidationRule/>
+                                <helpers:DestinationDirValidationRule/>
                             </Binding.ValidationRules>
                         </Binding>
                     </hc:TextBox.Text>
@@ -37,45 +45,60 @@
                         Margin="0,21,0,0"/>
             </StackPanel>
 
-            <StackPanel Margin="0,20,0,0">
+            <StackPanel HorizontalAlignment="Left"
+                        Margin="0,20,0,0"
+                        Width="320">
                 <TextBlock Text="Specify the exclude file and directory"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <TextBox Width="265"
                          HorizontalAlignment="Left"
+                         Text="{Binding ExcludedPaths}"
                          Margin="0,5,0,0"/>
             </StackPanel>
 
-            <StackPanel Margin="0,20,0,0">
+            <StackPanel HorizontalAlignment="Left"
+                        Margin="0,20,0,0"
+                        Width="320">
                 <TextBlock Text="Input mode"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
                              Content="Select files"
+                             IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_files}"
+                             Command="{Binding ChangeParameterCommand}"
                              Margin="0,5,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
                              Content="Select folder"
+                             IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_folder}"
+                             Command="{Binding ChangeParameterCommand}"
                              Margin="0,5,0,0"/>
             </StackPanel>
 
-            <StackPanel Margin="0,20,0,0">
-                <hc:CheckComboBox Style="{StaticResource CheckComboBoxPlus}" 
+            <StackPanel HorizontalAlignment="Left"
+                        Margin="0,20,0,0"
+                        Width="320">
+                <hc:CheckComboBox x:Name="CheckComboBox"
+                                  Style="{StaticResource CheckComboBoxPlus}" 
                                   hc:InfoElement.Title="Specify the accessibility of members to ignore"
                                   hc:InfoElement.Placeholder="Select modifiers"
+                                  IsEnabled="{Binding PublicMembersParameter, Converter={StaticResource inverseConverter}}"
+                                  ItemsSource="{Binding ModifierItems}"
+                                  helpers:CheckComboBoxHelper.Attach="True"
+                                  helpers:CheckComboBoxHelper.SelectedItems="{Binding SelectedModifierItems, Mode=TwoWay}"
                                   HorizontalAlignment="Left"
-                                  Width="300">
-                    <hc:CheckComboBoxItem Content="public"/>
-                    <hc:CheckComboBoxItem Content="internal"/>
-                    <hc:CheckComboBoxItem Content="protected internal"/>
-                    <hc:CheckComboBoxItem Content="protected"/>
-                    <hc:CheckComboBoxItem Content="private"/>
-                </hc:CheckComboBox>
+                                  Width="300"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
-                        Margin="0,20,0,0">
+                        HorizontalAlignment="Left"
+                        Margin="0,20,0,0"
+                        Width="320">
                 <ToggleButton Style="{StaticResource ToggleButtonSwitch}"
                               Background="{DynamicResource MainContentBackgroundBrush}"
+                              IsEnabled="{Binding SelectedModifierItems, Converter={StaticResource stringListConverter}}"
+                              IsChecked="{Binding PublicMembersParameter}"
+                              Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
                 <TextBlock Text="Output only public accesibility members"
                            Foreground="{DynamicResource PrimaryTextBrush}"
@@ -83,9 +106,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
-                        Margin="0,10,0,0">
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0"
+                        Width="320">
                 <ToggleButton Style="{StaticResource ToggleButtonSwitch}"
                               Background="{DynamicResource MainContentBackgroundBrush}"
+                              IsChecked="{Binding AssociationsParameter}"
+                              Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
                 <TextBlock Text="Create object associations"
                            Foreground="{DynamicResource PrimaryTextBrush}"
@@ -93,9 +120,14 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
-                        Margin="0,10,0,0">
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0"
+                        Width="320">
                 <ToggleButton Style="{StaticResource ToggleButtonSwitch}"
-                              Background="{DynamicResource MainContentBackgroundBrush}"
+                              Background="{DynamicResource MainContentBackgroundBrush}"                              
+                              IsEnabled="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_folder}"
+                              IsChecked="{Binding AllInOneParameter}"
+                              Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
                 <TextBlock Text="All-in-one"
                            Foreground="{DynamicResource PrimaryTextBrush}"
@@ -103,9 +135,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
-                        Margin="0,10,0,0">
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0"
+                        Width="320">
                 <ToggleButton Style="{StaticResource ToggleButtonSwitch}"
                               Background="{DynamicResource MainContentBackgroundBrush}"
+                              IsChecked="{Binding AttributeParameter}"
+                              Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
                 <TextBlock Text="Attribute required"
                            Foreground="{DynamicResource PrimaryTextBrush}"
@@ -113,9 +149,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
-                        Margin="0,10,0,0">
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0"
+                        Width="320">
                 <ToggleButton Style="{StaticResource ToggleButtonSwitch}"
                               Background="{DynamicResource MainContentBackgroundBrush}"
+                              IsChecked="{Binding ExcludeTagsParameter}"
+                              Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
                 <TextBlock Text="Exclude the &quot;@startuml&quot; and &quot;@enduml&quot; tags"
                            Foreground="{DynamicResource PrimaryTextBrush}"

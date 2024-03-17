@@ -1,19 +1,21 @@
-﻿using AutoDox.UI.Core;
+﻿using AutoDox.UI.Helpers;
+using AutoDox.UI.Core;
 
 namespace AutoDox.UI.ViewModels
 {
     class MainViewModel : ObservableObject
     {
-        public RelayCommand HomeViewCommand { get; set; }
-        public RelayCommand ConfigurationViewCommand { get; set; }
-        public RelayCommand SettingsViewCommand { get; set; }
-        public RelayCommand ChangeThemeCommand { get; set; }
+        private object _currentView;
 
         public HomeViewModel HomeVM { get; set; }
         public ConfigurationViewModel ConfigurationVM { get; set; }
         public SettingsViewModel SettingsVM { get; set; }
 
-        private object _currentView;
+        public RelayCommand HomeViewCommand { get; set; }
+        public RelayCommand ConfigurationViewCommand { get; set; }
+        public RelayCommand SettingsViewCommand { get; set; }
+        public RelayCommand ChangeThemeCommand { get; set; }
+
         public object CurrentView 
         {
             get { return _currentView; }

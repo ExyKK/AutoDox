@@ -7,7 +7,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels" 
-             xmlns:models="clr-namespace:AutoDox.UI.Models"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="425" d:DesignWidth="610">
     <UserControl.DataContext>
@@ -35,7 +35,7 @@
                 <hc:TextBox.Text>
                     <Binding Path="DestinationDirectory" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
-                            <models:DestinationDirValidationRule/>
+                            <helpers:DestinationDirValidationRule/>
                         </Binding.ValidationRules>
                     </Binding>
                 </hc:TextBox.Text>

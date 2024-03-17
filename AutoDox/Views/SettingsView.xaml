@@ -5,7 +5,7 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
-             xmlns:core="clr-namespace:AutoDox.UI.Core"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="425" d:DesignWidth="610">
@@ -14,7 +14,7 @@
     </UserControl.DataContext>
 
     <UserControl.Resources>
-        <core:Converter x:Key="converter"/>
+        <helpers:StringToBoolConverter x:Key="converter"/>
     </UserControl.Resources>
 
     <hc:ScrollViewer VerticalScrollBarVisibility="Auto" 
@@ -40,7 +40,7 @@
                          Width="265"
                          Margin="0,10,0,0"
                          HorizontalAlignment="Left"
-                         IsEditable="False" 
+                         IsEditable="False"
                          hc:InfoElement.Title="Language"/>
         </StackPanel>
     </hc:ScrollViewer>
