@@ -147,7 +147,7 @@ namespace AutoDox.UI.ViewModels
 
             ChangeParameterCommand = new RelayCommand(obj =>
             {
-                if (AllInOneParameter && InputMode == "Select_files")
+                if (AllInOneParameter && InputMode == "Select_file")
                     AllInOneParameter = false;
                 _configManager.SaveConfiguration();
             });

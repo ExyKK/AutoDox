@@ -64,8 +64,8 @@
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
-                             Content="Select files"
-                             IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_files}"
+                             Content="Select file"
+                             IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_file}"
                              Command="{Binding ChangeParameterCommand}"
                              Margin="0,5,0,0"/>
                 <RadioButton HorizontalAlignment="Left"

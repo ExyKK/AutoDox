@@ -15,13 +15,13 @@ namespace AutoDox.UI.Models
             return null;
         }
 
-        public static string[] SelectFiles()
+        public static string SelectFile()
         {
-            OpenFileDialog dialog = new() { Multiselect = true };
+            OpenFileDialog dialog = new();
 
             if ((bool)dialog.ShowDialog())
             {
-                return dialog.FileNames;
+                return dialog.FileName;
             }
             return null;
         }

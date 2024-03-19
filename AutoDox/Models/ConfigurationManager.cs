@@ -1,5 +1,8 @@
 ﻿using AutoDox.Properties;
 using AutoDox.UI.ViewModels;
+using System.Collections;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace AutoDox.UI.Models
@@ -37,6 +40,21 @@ namespace AutoDox.UI.Models
         {
             Config.Default.SelectedModifierItems = string.Join(",", configurationVM.SelectedModifierItems);
             Config.Default.Save();
+        }
+
+        public static Dictionary<string, object> GetConfiguration()
+        {
+            IEnumerator settingsEnumerator = Config.Default.PropertyValues.GetEnumerator();  
+            Dictionary<string, object> parameters = new();
+            
+            while (settingsEnumerator.MoveNext())
+            {
+                string key = ((SettingsPropertyValue)settingsEnumerator.Current).Name;
+                object value = ((SettingsPropertyValue)settingsEnumerator.Current).PropertyValue;
+                parameters[key] = value;
+            }
+
+            return parameters;
         }
 
         public static string GetDestinationDirectory()

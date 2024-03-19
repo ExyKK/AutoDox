@@ -1,31 +1,64 @@
-﻿using System;
+﻿using AutoDox.DiagramGenerator.Library;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AutoDox.UI.Models
 {
     class DiagramGeneratorManager
     {
-        string destinationDirectory;
-        string[] sourceFiles;
-        string[] pumlFiles;
+        private Dictionary<string, object> parameters;
+        private HttpRequestManager requestManager;
+        private string sourcePath;
+        private List<string> pumlFiles;
+        private string pumlPath;
 
-        public void Run(object destinationDirectory)
+        public void Run()
         {
-            this.destinationDirectory = (string)destinationDirectory;
+            parameters = ConfigurationManager.GetConfiguration();
+            requestManager = new();                
 
-            sourceFiles = ExplorerDialog.SelectFiles();
-
-            // scan source files, create .puml`s
-
-            Test();
+            if (parameters["InputMode"].ToString() == "Select_folder")
+            {
+                sourcePath = ExplorerDialog.SelectFolder();
+                if (sourcePath != null)
+                {
+                    if(GeneratePlantUmlFromDir())
+                    {
+                        requestManager.GetSvgFromPlantUml(pumlFiles);
+                    }
+                    else
+                    {
+                        // handle error
+                    }
+                }
+            }
+            else if (parameters["InputMode"].ToString() == "Select_file")
+            {
+                sourcePath = ExplorerDialog.SelectFile();
+                if (sourcePath != null)
+                {
+                    if (GeneratePlantUmlFromFile())
+                    {
+                        requestManager.GetSvgFromPlantUml(pumlPath);
+                    }
+                    else
+                    {
+                        // handle error
+                    }
+                }
+            }
         }
 
-        public string Read()
+        public static string ReadPlantUml(string path)
         {
             StringBuilder pumlString = new();
-            using (StreamReader reader = new(sourceFiles[0])) // change source files to puml
+            using (StreamReader reader = new(path))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -36,77 +69,194 @@ namespace AutoDox.UI.Models
             return pumlString.ToString();
         }
 
-        public void Write(string input)
+        public static void WriteSvg(string input, string path)
         {
+            string destinationDirectory = Path.GetDirectoryName(path);
             if (!Directory.Exists(destinationDirectory))
                 Directory.CreateDirectory(destinationDirectory);
 
-            using (StreamWriter writer = new(Path.Combine(destinationDirectory, "result.svg")))
+            using (StreamWriter writer = new(path))
             {
                 writer.Write(input);
             }
         }
 
-        //private void OnSendRequestButtonClicked()
-        //{
-        //    string targetUrl = "https://kroki.io/plantuml/svg/";
-        //    RequestMethod requestMethod = RequestMethod.POST;
-        //    ByteArrayContent requestBody = new ByteArrayContent(
-        //        Encoding.UTF8.GetBytes(Read())
-        //    );
-            
-        //    SendRequest(targetUrl, requestMethod, requestBody);
-        //}
-
-        private async void Test()
+        private bool GeneratePlantUmlFromFile()
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://kroki.io/");
-            client.DefaultRequestHeaders.Add("Accept", "image/svg+xml");
+            if (!File.Exists(sourcePath))
+            {
+                Console.WriteLine($"\"{sourcePath}\" does not exist.");
+                return false;
+            }
+            pumlPath = CombinePath(Path.GetFullPath(parameters["DestinationDirectory"].ToString()),
+                                   Path.GetFileNameWithoutExtension(sourcePath) + ".puml");
+            try
+            {
+                using var stream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read);
+                var tree = CSharpSyntaxTree.ParseText(SourceText.From(stream));
+                var root = tree.GetRoot();
+                Accessibilities ignoreAcc = GetIgnoreAccessibilities();
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "plantuml/svg/");
-            request.Content = new StringContent(Read(),
-                                                Encoding.UTF8,
-                                                "text/plain");//CONTENT-TYPE header
-
-            HttpResponseMessage httpResponse = null;
-            //httpResponse = await client.PostAsync(target, body);
-
-            httpResponse = client.SendAsync(request).Result;
-
-            HttpContent responseContent = httpResponse.Content;
-            string result = await responseContent.ReadAsStringAsync();
-
-            Write(result);
-
-            //client.SendAsync(request)
-            //      .ContinueWith(responseTask =>
-            //      {
-            //          Write(responseTask.Result.ToString());
-            //      });
+                using var filestream = new FileStream(pumlPath, FileMode.Create, FileAccess.Write);
+                using var writer = new StreamWriter(filestream);
+                var gen = new ClassDiagramGenerator(
+                    writer,
+                    "    ",
+                    ignoreAcc,
+                    (bool)parameters["AssociationsParameter"],
+                    (bool)parameters["AttributeParameter"],
+                    (bool)parameters["ExcludeTagsParameter"]);
+                gen.Generate(root);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
         }
 
-        //private async void SendRequest(string target, RequestMethod method, HttpContent body)
-        //{
-        //    RequestManager manager = RequestManager.Get();
-        //    RequestManager.Response response = await manager.SendRequest(MakeAbsolute(target), method, body);
+        private bool GeneratePlantUmlFromDir()
+        {
+            if (!Directory.Exists(sourcePath))
+            {
+                Console.WriteLine($"Directory \"{sourcePath}\" does not exist.");
+                return false;
+            }
 
-        //    string contentOutput = response.content;
-        //    Write(contentOutput);
+            var outputRoot = Path.GetFullPath(sourcePath);
+            if (parameters.TryGetValue("DestinationDirectory", out object outValue))
+            {
+                outputRoot = outValue.ToString();
+                try
+                {
+                    Directory.CreateDirectory(outputRoot);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
+            }
 
-        //    string statusCodeOutput = $"Response Code: {response.statusCodeName} ({response.statusCode}).";
-        //}
+            var excludePaths = new List<string>();
+            var pumlexclude = CombinePath(sourcePath, ".pumlexclude");
+            if (File.Exists(pumlexclude))
+            {
+                excludePaths = File
+                    .ReadAllLines(pumlexclude)
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Select(path => path.Trim())
+                    .ToList();
+            }
+            if (parameters.TryGetValue("ExcludedPaths", out object excludePathValue))
+            {
+                var splitOptions = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+                excludePaths.AddRange(excludePathValue.ToString().Split(',', splitOptions));
+            }
 
-        //private string MakeAbsolute(string url)
-        //{
-        //    if (url.StartsWith("https://") || url.StartsWith("http://"))
-        //    {
-        //        return url;
-        //    }
-        //    else
-        //    {
-        //        return $"https://{url}";
-        //    }
-        //}
+            var excludeUmlBeginEndTags = (bool)parameters["ExcludeTagsParameter"];
+            var files = Directory.EnumerateFiles(sourcePath, "*.cs", SearchOption.AllDirectories);
+
+            var includeRefs = new StringBuilder();
+            if (!excludeUmlBeginEndTags) includeRefs.AppendLine("@startuml");
+
+            pumlFiles = new();
+            var error = false;
+            var filesToProcess = ExcludeFileFilter.GetFilesToProcess(files, excludePaths, sourcePath);
+            foreach (var inputFile in filesToProcess)
+            {
+                Console.WriteLine($"Processing \"{inputFile}\"...");
+                try
+                {
+                    var outputDir = CombinePath(outputRoot, Path.GetDirectoryName(inputFile).Replace(sourcePath, ""));
+                    Directory.CreateDirectory(outputDir);
+                    var outputFile = CombinePath(outputDir,
+                        Path.GetFileNameWithoutExtension(inputFile) + ".puml");
+
+                    using (var stream = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
+                    {
+                        var tree = CSharpSyntaxTree.ParseText(SourceText.From(stream));
+                        var root = tree.GetRoot();
+                        Accessibilities ignoreAcc = GetIgnoreAccessibilities();
+
+                        using var filestream = new FileStream(outputFile, FileMode.Create, FileAccess.Write);
+                        using var writer = new StreamWriter(filestream);
+                        var gen = new ClassDiagramGenerator(
+                            writer,
+                            "    ",
+                            ignoreAcc,
+                            (bool)parameters["AssociationsParameter"],
+                            (bool)parameters["AttributeParameter"],
+                            excludeUmlBeginEndTags);
+                        gen.Generate(root);
+                    }
+
+                    if ((bool)parameters["AllInOneParameter"])
+                    {
+                        var lines = File.ReadAllLines(outputFile);
+                        if (!excludeUmlBeginEndTags)
+                        {
+                            lines = lines.Skip(1).SkipLast(1).ToArray();
+                        }
+                        foreach (string line in lines)
+                        {
+                            includeRefs.AppendLine(line);
+                        }
+                    }
+                    else
+                    {
+                        var newRoot = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @".\" : @".";
+                        includeRefs.AppendLine("!include " + outputFile.Replace(outputRoot, newRoot));
+                    }
+
+                    pumlFiles.Add(outputFile);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    error = true;
+                }
+            }
+            if (!excludeUmlBeginEndTags) includeRefs.AppendLine("@enduml");
+            string includeFile = CombinePath(outputRoot, "include.puml");
+            File.WriteAllText(includeFile, includeRefs.ToString());
+
+            pumlFiles.Add(includeFile);
+
+            if (error)
+            {
+                Console.WriteLine("There were files that could not be processed.");
+                return false;
+            }
+            return true;
+        }
+
+        private Accessibilities GetIgnoreAccessibilities()
+        {
+            var ignoreAcc = Accessibilities.None;
+            if ((bool)parameters["PublicMembersParameter"])
+            {
+                ignoreAcc = Accessibilities.Private | Accessibilities.Internal
+                    | Accessibilities.Protected | Accessibilities.ProtectedInternal;
+            }
+            else if (parameters.TryGetValue("SelectedModifierItems", out object value))
+            {
+                var ignoreItems = value.ToString().Split(',');
+                foreach (var item in ignoreItems)
+                {
+                    if (Enum.TryParse(item, true, out Accessibilities acc))
+                    {
+                        ignoreAcc |= acc;
+                    }
+                }
+            }
+            return ignoreAcc;
+        }
+
+        private static string CombinePath(string first, string second)
+        {
+            return PathHelper.CombinePath(first, second);
+        }
     }
 }

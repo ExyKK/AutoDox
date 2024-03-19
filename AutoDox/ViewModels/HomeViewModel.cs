@@ -51,7 +51,7 @@ namespace AutoDox.UI.ViewModels
 
             ReadFromDeviceCommand = new RelayCommand(obj =>
             {
-                _diagramGenerator.Run(DestinationDirectory);
+                _diagramGenerator.Run();
             },
             (obj) => !string.IsNullOrEmpty(DestinationDirectory));
 
