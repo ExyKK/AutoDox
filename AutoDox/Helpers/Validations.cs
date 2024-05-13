@@ -10,7 +10,7 @@ namespace AutoDox.UI.Helpers
         {
             if (!Directory.Exists(value.ToString()))
             {
-                return new ValidationResult(false, "Please enter a path to existing directory");
+                return new ValidationResult(false, Properties.Resources.DestinationDirectoryInvalid);
             }
             return ValidationResult.ValidResult;
         }

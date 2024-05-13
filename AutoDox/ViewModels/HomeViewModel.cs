@@ -9,7 +9,6 @@ namespace AutoDox.UI.ViewModels
     {
         private string _destinationDirectory;
         private static string _svgColor;
-        private DiagramGeneratorManager _diagramGenerator;
 
         public RelayCommand BrowseDestinationDirectoryCommand { get; set; }
         public RelayCommand ReadFromDeviceCommand { get; set; }
@@ -39,8 +38,6 @@ namespace AutoDox.UI.ViewModels
 
         public HomeViewModel() 
         {
-            _diagramGenerator = new DiagramGeneratorManager();
-
             DestinationDirectory = ConfigurationManager.GetDestinationDirectory();
             SvgColor = ThemeChanger.GetSvgColor();
 
@@ -51,7 +48,7 @@ namespace AutoDox.UI.ViewModels
 
             ReadFromDeviceCommand = new RelayCommand(obj =>
             {
-                _diagramGenerator.Run();
+                MainViewModel.CurrentView = new GenerationViewModel();
             },
             (obj) => !string.IsNullOrEmpty(DestinationDirectory));
 

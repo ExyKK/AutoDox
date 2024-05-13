@@ -5,8 +5,9 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
-             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
+             xmlns:props="clr-namespace:AutoDox.UI.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="425" d:DesignWidth="610">
     <UserControl.DataContext>
@@ -27,7 +28,7 @@
                         Width="320">
                 <hc:TextBox x:Name="destinationDirTextBox"
                             Width="265"
-                            hc:InfoElement.Title="Destination directory">
+                            hc:InfoElement.Title="{x:Static props:Resources.DestinationDirectory}">
                     <hc:TextBox.Text>
                         <Binding Path="DestinationDirectory" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -48,7 +49,7 @@
             <StackPanel HorizontalAlignment="Left"
                         Margin="0,20,0,0"
                         Width="320">
-                <TextBlock Text="Specify the exclude file and directory"
+                <TextBlock Text="{x:Static props:Resources.SpecifyExclude}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <TextBox Width="265"
@@ -60,16 +61,16 @@
             <StackPanel HorizontalAlignment="Left"
                         Margin="0,20,0,0"
                         Width="320">
-                <TextBlock Text="Input mode"
+                <TextBlock Text="{x:Static props:Resources.InputMode}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
-                             Content="Select file"
+                             Content="{x:Static props:Resources.SelectFile}"
                              IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_file}"
                              Command="{Binding ChangeParameterCommand}"
                              Margin="0,5,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
-                             Content="Select folder"
+                             Content="{x:Static props:Resources.SelectFolder}"
                              IsChecked="{Binding InputMode, Converter={StaticResource stringConverter}, ConverterParameter=Select_folder}"
                              Command="{Binding ChangeParameterCommand}"
                              Margin="0,5,0,0"/>
@@ -80,8 +81,8 @@
                         Width="320">
                 <hc:CheckComboBox x:Name="CheckComboBox"
                                   Style="{StaticResource CheckComboBoxPlus}" 
-                                  hc:InfoElement.Title="Specify the accessibility of members to ignore"
-                                  hc:InfoElement.Placeholder="Select modifiers"
+                                  hc:InfoElement.Title="{x:Static props:Resources.SpecifyIgnoredModifiers}"
+                                  hc:InfoElement.Placeholder="{x:Static props:Resources.SelectModifiers}"
                                   IsEnabled="{Binding PublicMembersParameter, Converter={StaticResource inverseConverter}}"
                                   ItemsSource="{Binding ModifierItems}"
                                   helpers:CheckComboBoxHelper.Attach="True"
@@ -100,7 +101,7 @@
                               IsChecked="{Binding PublicMembersParameter}"
                               Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
-                <TextBlock Text="Output only public accesibility members"
+                <TextBlock Text="{x:Static props:Resources.OutputOnlyPublic}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="5,0,0,0"/>
             </StackPanel>
@@ -114,7 +115,7 @@
                               IsChecked="{Binding AssociationsParameter}"
                               Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
-                <TextBlock Text="Create object associations"
+                <TextBlock Text="{x:Static props:Resources.CreateAssociations}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="5,0,0,0"/>
             </StackPanel>
@@ -129,7 +130,7 @@
                               IsChecked="{Binding AllInOneParameter}"
                               Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
-                <TextBlock Text="All-in-one"
+                <TextBlock Text="{x:Static props:Resources.AllInOne}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="5,0,0,0"/>
             </StackPanel>
@@ -143,7 +144,7 @@
                               IsChecked="{Binding AttributeParameter}"
                               Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
-                <TextBlock Text="Attribute required"
+                <TextBlock Text="{x:Static props:Resources.AttributeRequired}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="5,0,0,0"/>
             </StackPanel>
@@ -157,7 +158,7 @@
                               IsChecked="{Binding ExcludeTagsParameter}"
                               Command="{Binding ChangeParameterCommand}"
                               Height="15"/>
-                <TextBlock Text="Exclude the &quot;@startuml&quot; and &quot;@enduml&quot; tags"
+                <TextBlock Text="{x:Static props:Resources.ExcludeTags}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="5,0,0,0"/>
             </StackPanel>

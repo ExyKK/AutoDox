@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="AutoDox.UI.Views.GenerationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:local="clr-namespace:AutoDox.UI.Views"
+             xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
+             xmlns:props="clr-namespace:AutoDox.UI.Properties"
+             mc:Ignorable="d" 
+             d:DesignHeight="425" d:DesignWidth="610">
+    <UserControl.DataContext>
+        <viewModels:GenerationViewModel/>
+    </UserControl.DataContext>
+
+    <hc:Interaction.Triggers>
+        <hc:EventTrigger EventName="Loaded">
+            <hc:InvokeCommandAction Command="{Binding OnWindowLoadedCommand}"/>
+        </hc:EventTrigger>
+    </hc:Interaction.Triggers>
+
+    <StackPanel>
+        <TextBox IsReadOnly="True"
+                 Focusable="False"
+                 TextWrapping="Wrap"
+                 VerticalContentAlignment="Top"
+                 VerticalScrollBarVisibility="Auto"
+                 helpers:TextBoxBehavior.AutoScrollToEnd="True"
+                 Height="350"
+                 Text="{Binding DiagramGenerator.Logs}"/>
+
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="0,10,0,0"
+                    Content="{x:Static props:Resources.Back}"
+                    Command="{Binding ReturnHomeCommand}"
+                    Width="170">
+            </Button>
+
+            <Button Margin="257,10,0,0"
+                    Style="{StaticResource ButtonPrimary}"
+                    Content="{x:Static props:Resources.OpenDestinationDirectory}"
+                    Command="{Binding OpenDestinationDirectoryCommand}"
+                    Width="170">
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

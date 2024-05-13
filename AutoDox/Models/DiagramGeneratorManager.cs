@@ -12,47 +12,58 @@ namespace AutoDox.UI.Models
 {
     class DiagramGeneratorManager
     {
-        private Dictionary<string, object> parameters;
-        private HttpRequestManager requestManager;
-        private string sourcePath;
-        private List<string> pumlFiles;
-        private string pumlPath;
+        private Dictionary<string, object> _parameters;
+        private HttpRequestManager _requestManager;
+        private string _sourcePath;
+        private List<string> _pumlFiles;
+        private string _pumlPath;
 
-        public void Run()
+        private static string _logs;
+        public static event EventHandler LogsChanged;
+        public static string Logs
         {
-            parameters = ConfigurationManager.GetConfiguration();
-            requestManager = new();                
-
-            if (parameters["InputMode"].ToString() == "Select_folder")
+            get { return _logs; }
+            set
             {
-                sourcePath = ExplorerDialog.SelectFolder();
-                if (sourcePath != null)
+                _logs = value;
+                LogsChanged?.Invoke(null, EventArgs.Empty);
+            }
+        }
+
+        public bool Run()
+        {
+            _parameters = ConfigurationManager.GetConfiguration();
+            _requestManager = new();
+
+            _sourcePath = ExplorerDialog.SelectFolder();
+            if (_sourcePath != null)
+            {
+                Logs += $"Generation from {_sourcePath} started.\n";
+                if (_parameters["InputMode"].ToString() == "Select_folder")
                 {
-                    if(GeneratePlantUmlFromDir())
+                    if (GeneratePlantUmlFromDir())
                     {
-                        requestManager.GetSvgFromPlantUml(pumlFiles);
+                        _requestManager.GetSvgFromPlantUml(_pumlFiles);                        
                     }
                     else
                     {
-                        // handle error
+                        Logs += "Jobs finished with error.\n";
                     }
                 }
-            }
-            else if (parameters["InputMode"].ToString() == "Select_file")
-            {
-                sourcePath = ExplorerDialog.SelectFile();
-                if (sourcePath != null)
+                else if (_parameters["InputMode"].ToString() == "Select_file")
                 {
                     if (GeneratePlantUmlFromFile())
                     {
-                        requestManager.GetSvgFromPlantUml(pumlPath);
+                        _requestManager.GetSvgFromPlantUml(_pumlPath);
                     }
                     else
                     {
-                        // handle error
+                        Logs += "Jobs finished with error.\n";
                     }
                 }
+                return true;
             }
+            return false;
         }
 
         public static string ReadPlantUml(string path)
@@ -83,34 +94,34 @@ namespace AutoDox.UI.Models
 
         private bool GeneratePlantUmlFromFile()
         {
-            if (!File.Exists(sourcePath))
+            if (!File.Exists(_sourcePath))
             {
-                Console.WriteLine($"\"{sourcePath}\" does not exist.");
+                Logs += $"\"{_sourcePath}\" does not exist.\n";
                 return false;
             }
-            pumlPath = CombinePath(Path.GetFullPath(parameters["DestinationDirectory"].ToString()),
-                                   Path.GetFileNameWithoutExtension(sourcePath) + ".puml");
+            _pumlPath = CombinePath(Path.GetFullPath(_parameters["DestinationDirectory"].ToString()),
+                                   Path.GetFileNameWithoutExtension(_sourcePath) + ".puml");
             try
             {
-                using var stream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read);
+                using var stream = new FileStream(_sourcePath, FileMode.Open, FileAccess.Read);
                 var tree = CSharpSyntaxTree.ParseText(SourceText.From(stream));
                 var root = tree.GetRoot();
                 Accessibilities ignoreAcc = GetIgnoreAccessibilities();
 
-                using var filestream = new FileStream(pumlPath, FileMode.Create, FileAccess.Write);
+                using var filestream = new FileStream(_pumlPath, FileMode.Create, FileAccess.Write);
                 using var writer = new StreamWriter(filestream);
                 var gen = new ClassDiagramGenerator(
                     writer,
                     "    ",
                     ignoreAcc,
-                    (bool)parameters["AssociationsParameter"],
-                    (bool)parameters["AttributeParameter"],
-                    (bool)parameters["ExcludeTagsParameter"]);
+                    (bool)_parameters["AssociationsParameter"],
+                    (bool)_parameters["AttributeParameter"],
+                    (bool)_parameters["ExcludeTagsParameter"]);
                 gen.Generate(root);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logs += $"{e}\n";
                 return false;
             }
             return true;
@@ -118,14 +129,14 @@ namespace AutoDox.UI.Models
 
         private bool GeneratePlantUmlFromDir()
         {
-            if (!Directory.Exists(sourcePath))
+            if (!Directory.Exists(_sourcePath))
             {
-                Console.WriteLine($"Directory \"{sourcePath}\" does not exist.");
+                Logs += $"Directory \"{_sourcePath}\" does not exist.\n";
                 return false;
             }
 
-            var outputRoot = Path.GetFullPath(sourcePath);
-            if (parameters.TryGetValue("DestinationDirectory", out object outValue))
+            var outputRoot = Path.GetFullPath(_sourcePath);
+            if (_parameters.TryGetValue("DestinationDirectory", out object outValue))
             {
                 outputRoot = outValue.ToString();
                 try
@@ -134,13 +145,13 @@ namespace AutoDox.UI.Models
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Logs += $"{e}\n";
                     return false;
                 }
             }
 
             var excludePaths = new List<string>();
-            var pumlexclude = CombinePath(sourcePath, ".pumlexclude");
+            var pumlexclude = CombinePath(_sourcePath, ".pumlexclude");
             if (File.Exists(pumlexclude))
             {
                 excludePaths = File
@@ -149,27 +160,27 @@ namespace AutoDox.UI.Models
                     .Select(path => path.Trim())
                     .ToList();
             }
-            if (parameters.TryGetValue("ExcludedPaths", out object excludePathValue))
+            if (_parameters.TryGetValue("ExcludedPaths", out object excludePathValue))
             {
                 var splitOptions = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
                 excludePaths.AddRange(excludePathValue.ToString().Split(',', splitOptions));
             }
 
-            var excludeUmlBeginEndTags = (bool)parameters["ExcludeTagsParameter"];
-            var files = Directory.EnumerateFiles(sourcePath, "*.cs", SearchOption.AllDirectories);
+            var excludeUmlBeginEndTags = (bool)_parameters["ExcludeTagsParameter"];
+            var files = Directory.EnumerateFiles(_sourcePath, "*.cs", SearchOption.AllDirectories);
 
             var includeRefs = new StringBuilder();
             if (!excludeUmlBeginEndTags) includeRefs.AppendLine("@startuml");
 
-            pumlFiles = new();
+            _pumlFiles = new();
             var error = false;
-            var filesToProcess = ExcludeFileFilter.GetFilesToProcess(files, excludePaths, sourcePath);
+            var filesToProcess = ExcludeFileFilter.GetFilesToProcess(files, excludePaths, _sourcePath);
             foreach (var inputFile in filesToProcess)
             {
-                Console.WriteLine($"Processing \"{inputFile}\"...");
+                Logs += $"Processing \"{inputFile}\"...\n";
                 try
                 {
-                    var outputDir = CombinePath(outputRoot, Path.GetDirectoryName(inputFile).Replace(sourcePath, ""));
+                    var outputDir = CombinePath(outputRoot, Path.GetDirectoryName(inputFile).Replace(_sourcePath, ""));
                     Directory.CreateDirectory(outputDir);
                     var outputFile = CombinePath(outputDir,
                         Path.GetFileNameWithoutExtension(inputFile) + ".puml");
@@ -186,13 +197,13 @@ namespace AutoDox.UI.Models
                             writer,
                             "    ",
                             ignoreAcc,
-                            (bool)parameters["AssociationsParameter"],
-                            (bool)parameters["AttributeParameter"],
+                            (bool)_parameters["AssociationsParameter"],
+                            (bool)_parameters["AttributeParameter"],
                             excludeUmlBeginEndTags);
                         gen.Generate(root);
                     }
 
-                    if ((bool)parameters["AllInOneParameter"])
+                    if ((bool)_parameters["AllInOneParameter"])
                     {
                         var lines = File.ReadAllLines(outputFile);
                         if (!excludeUmlBeginEndTags)
@@ -210,11 +221,11 @@ namespace AutoDox.UI.Models
                         includeRefs.AppendLine("!include " + outputFile.Replace(outputRoot, newRoot));
                     }
 
-                    pumlFiles.Add(outputFile);
+                    _pumlFiles.Add(outputFile);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Logs += $"{e}\n";
                     error = true;
                 }
             }
@@ -222,11 +233,11 @@ namespace AutoDox.UI.Models
             string includeFile = CombinePath(outputRoot, "include.puml");
             File.WriteAllText(includeFile, includeRefs.ToString());
 
-            pumlFiles.Add(includeFile);
+            _pumlFiles.Add(includeFile);
 
             if (error)
             {
-                Console.WriteLine("There were files that could not be processed.");
+                Logs += "There were files that could not be processed.\n";
                 return false;
             }
             return true;
@@ -235,12 +246,12 @@ namespace AutoDox.UI.Models
         private Accessibilities GetIgnoreAccessibilities()
         {
             var ignoreAcc = Accessibilities.None;
-            if ((bool)parameters["PublicMembersParameter"])
+            if ((bool)_parameters["PublicMembersParameter"])
             {
                 ignoreAcc = Accessibilities.Private | Accessibilities.Internal
                     | Accessibilities.Protected | Accessibilities.ProtectedInternal;
             }
-            else if (parameters.TryGetValue("SelectedModifierItems", out object value))
+            else if (_parameters.TryGetValue("SelectedModifierItems", out object value))
             {
                 var ignoreItems = value.ToString().Split(',');
                 foreach (var item in ignoreItems)

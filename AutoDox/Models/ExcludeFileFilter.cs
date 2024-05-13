@@ -17,7 +17,7 @@ namespace AutoDox.UI.Models
 
             if (isExcluded)
             {
-                Console.WriteLine($"Skipped \"{inputFile}\"...");
+                DiagramGeneratorManager.Logs += $"Skipped \"{inputFile}\"...\n";
             }
 
             return isExcluded;

@@ -1,11 +1,12 @@
 ﻿using AutoDox.UI.Helpers;
 using AutoDox.UI.Core;
+using System;
 
 namespace AutoDox.UI.ViewModels
 {
     class MainViewModel : ObservableObject
     {
-        private object _currentView;
+        private static object _currentView;
 
         public HomeViewModel HomeVM { get; set; }
         public ConfigurationViewModel ConfigurationVM { get; set; }
@@ -16,13 +17,14 @@ namespace AutoDox.UI.ViewModels
         public RelayCommand SettingsViewCommand { get; set; }
         public RelayCommand ChangeThemeCommand { get; set; }
 
-        public object CurrentView 
+        public static event EventHandler CurrentViewChanged;
+        public static object CurrentView 
         {
             get { return _currentView; }
             set 
             { 
                 _currentView = value;
-                OnPropertyChanged();
+                CurrentViewChanged?.Invoke(null, EventArgs.Empty);
             }
         }
 

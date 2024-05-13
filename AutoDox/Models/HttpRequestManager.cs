@@ -21,6 +21,8 @@ namespace AutoDox.UI.Models
 
         public async void GetSvgFromPlantUml(string pumlPath)
         {
+            DiagramGeneratorManager.Logs += $"Generating .svg from {pumlPath}...\n";
+
             byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(pumlPath)));
             string encodedOutput = Convert.ToBase64String(compressedBytes).Replace('+', '-').Replace('/', '_');
 
@@ -29,12 +31,16 @@ namespace AutoDox.UI.Models
             string result = await responseContent.ReadAsStringAsync();
             DiagramGeneratorManager.WriteSvg(result, Path.Combine(Path.GetDirectoryName(pumlPath),
                                                      Path.GetFileNameWithoutExtension(pumlPath) + ".svg"));
+
+            DiagramGeneratorManager.Logs += "Jobs finished successfully.\n";
         }
 
         public async void GetSvgFromPlantUml(List<string> pumlPaths)
         {
             foreach (string path in pumlPaths)
             {
+                DiagramGeneratorManager.Logs += $"Generating .svg from {path}...\n";
+
                 byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(path)));
                 string encodedOutput = Convert.ToBase64String(compressedBytes).Replace('+', '-').Replace('/', '_');
 
@@ -43,7 +49,8 @@ namespace AutoDox.UI.Models
                 string result = await responseContent.ReadAsStringAsync();
                 DiagramGeneratorManager.WriteSvg(result, Path.Combine(Path.GetDirectoryName(path),
                                                          Path.GetFileNameWithoutExtension(path) + ".svg"));
-            }                                    
+            }
+            DiagramGeneratorManager.Logs += "Jobs finished successfully.\n";
         }
 
         private static byte[] ZlibDeflate(byte[] data, CompressionLevel? level = null)

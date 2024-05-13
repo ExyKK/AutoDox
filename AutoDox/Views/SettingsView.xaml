@@ -5,8 +5,9 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AutoDox.UI.Views"
-             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
              xmlns:viewModels="clr-namespace:AutoDox.UI.ViewModels"
+             xmlns:helpers="clr-namespace:AutoDox.UI.Helpers"
+             xmlns:props="clr-namespace:AutoDox.UI.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="425" d:DesignWidth="610">
     <UserControl.DataContext>
@@ -21,27 +22,34 @@
                      IsInertiaEnabled="True">
         <StackPanel>
             <StackPanel>
-                <TextBlock Text="Application theme"
+                <TextBlock Text="{x:Static props:Resources.ApplicationTheme}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            Margin="10,0,0,0"/>
                 <RadioButton HorizontalAlignment="Left"
                              Margin="0,5,0,0"
-                             Content="Light"
+                             Content="{x:Static props:Resources.Light}"
                              IsChecked="{Binding Theme, Converter={StaticResource converter}, ConverterParameter=Light}"
                              Command="{Binding ChangeThemeCommand}"/>
                 <RadioButton HorizontalAlignment="Left"
                              Margin="0,5,0,0"
-                             Content="Dark"
+                             Content="{x:Static props:Resources.Dark}"
                              IsChecked="{Binding Theme, Converter={StaticResource converter}, ConverterParameter=Dark}"
                              Command="{Binding ChangeThemeCommand}"/>
             </StackPanel>
 
-            <hc:ComboBox ItemsSource="{Binding DataList}"
-                         Width="265"
+            <hc:ComboBox HorizontalAlignment="Left"
                          Margin="0,10,0,0"
-                         HorizontalAlignment="Left"
+                         hc:InfoElement.Title="{x:Static props:Resources.Language}"
+                         ItemsSource="{Binding Languages}"                         
                          IsEditable="False"
-                         hc:InfoElement.Title="Language"/>
+                         Width="265"
+                         SelectedItem="{Binding CurrentLanguage}">
+                <hc:Interaction.Triggers>
+                    <hc:EventTrigger EventName="SelectionChanged">
+                        <hc:InvokeCommandAction Command="{Binding ChangeLanguageCommand}"/>
+                    </hc:EventTrigger>
+                </hc:Interaction.Triggers>
+            </hc:ComboBox>
         </StackPanel>
     </hc:ScrollViewer>
 </UserControl>
