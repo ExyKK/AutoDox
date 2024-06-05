@@ -35,23 +35,29 @@ namespace AutoDox.UI.Models
             _parameters = ConfigurationManager.GetConfiguration();
             _requestManager = new();
 
-            _sourcePath = ExplorerDialog.SelectFolder();
-            if (_sourcePath != null)
+            if (_parameters["InputMode"].ToString() == "Select_folder")
             {
-                Logs += $"Generation from {_sourcePath} started.\n";
-                if (_parameters["InputMode"].ToString() == "Select_folder")
+                _sourcePath = ExplorerDialog.SelectFolder();
+                if (_sourcePath != null)
                 {
+                    Logs += $"Generation from {_sourcePath} started.\n";
                     if (GeneratePlantUmlFromDir())
                     {
-                        _requestManager.GetSvgFromPlantUml(_pumlFiles);                        
+                        _requestManager.GetSvgFromPlantUml(_pumlFiles);
                     }
                     else
                     {
                         Logs += "Jobs finished with error.\n";
                     }
-                }
-                else if (_parameters["InputMode"].ToString() == "Select_file")
+                    return true;
+                }                
+            }
+            else if (_parameters["InputMode"].ToString() == "Select_file")
+            {
+                _sourcePath = ExplorerDialog.SelectFile();
+                if (_sourcePath != null)
                 {
+                    Logs += $"Generation from {_sourcePath} started.\n";
                     if (GeneratePlantUmlFromFile())
                     {
                         _requestManager.GetSvgFromPlantUml(_pumlPath);
@@ -60,8 +66,8 @@ namespace AutoDox.UI.Models
                     {
                         Logs += "Jobs finished with error.\n";
                     }
-                }
-                return true;
+                    return true;
+                }                
             }
             return false;
         }
