@@ -1,14 +1,15 @@
-﻿using System;
+﻿using System.Threading.Tasks;
+using System;
 using System.Windows.Input;
 
 namespace AutoDox.UI.Core
 {
-    internal class RelayCommand : ICommand
+    internal class AsyncRelayCommand : ICommand
     {
-        private readonly Action<object> _execute;
+        private readonly Func<object, Task> _execute;
         private readonly Func<object, bool> _canExecute;
 
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        public AsyncRelayCommand(Func<object, Task> execute, Func<object, bool> canExecute = null)
         {
             _execute = execute;
             _canExecute = canExecute;
@@ -19,9 +20,9 @@ namespace AutoDox.UI.Core
             return _canExecute == null || _canExecute(parameter);
         }
 
-        public void Execute(object parameter)
+        public async void Execute(object parameter)
         {
-            _execute(parameter);
+            await _execute(parameter);
         }
 
         public event EventHandler CanExecuteChanged

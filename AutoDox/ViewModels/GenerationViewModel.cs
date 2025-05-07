@@ -8,7 +8,7 @@ namespace AutoDox.UI.ViewModels
     {
         private DiagramGeneratorManager _diagramGenerator;
 
-        public RelayCommand OnWindowLoadedCommand { get; set; }
+        public AsyncRelayCommand OnWindowLoadedCommand { get; set; }
         public RelayCommand ReturnHomeCommand { get; set; }
         public RelayCommand OpenDestinationDirectoryCommand { get; set; }
 
@@ -26,9 +26,9 @@ namespace AutoDox.UI.ViewModels
         {
             _diagramGenerator = new DiagramGeneratorManager();
             
-            OnWindowLoadedCommand = new RelayCommand(obj =>
+            OnWindowLoadedCommand = new AsyncRelayCommand(async obj =>
             {
-                if (!_diagramGenerator.Run())
+                if (!await _diagramGenerator.Run())
                 {
                     MainViewModel.CurrentView = new HomeViewModel();
                 }

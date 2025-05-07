@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AutoDox.UI.Models
 {
@@ -30,7 +31,7 @@ namespace AutoDox.UI.Models
             }
         }
 
-        public bool Run()
+        public async Task<bool> Run()
         {
             _parameters = ConfigurationManager.GetConfiguration();
             _requestManager = new();
@@ -43,13 +44,10 @@ namespace AutoDox.UI.Models
                     Logs += $"Generation from {_sourcePath} started.\n";
                     if (GeneratePlantUmlFromDir())
                     {
-                        _requestManager.GetSvgFromPlantUml(_pumlFiles);
+                        await _requestManager.GetSvgFromPlantUml(_pumlFiles);
+                        return true;
                     }
-                    else
-                    {
-                        Logs += "Jobs finished with error.\n";
-                    }
-                    return true;
+                    Logs += "Jobs finished with error.\n";
                 }                
             }
             else if (_parameters["InputMode"].ToString() == "Select_file")
@@ -60,13 +58,10 @@ namespace AutoDox.UI.Models
                     Logs += $"Generation from {_sourcePath} started.\n";
                     if (GeneratePlantUmlFromFile())
                     {
-                        _requestManager.GetSvgFromPlantUml(_pumlPath);
+                        await _requestManager.GetSvgFromPlantUml(_pumlPath);
+                        return true;
                     }
-                    else
-                    {
-                        Logs += "Jobs finished with error.\n";
-                    }
-                    return true;
+                    Logs += "Jobs finished with error.\n";
                 }                
             }
             return false;

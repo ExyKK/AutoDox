@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AutoDox.UI.Models
 {
@@ -19,38 +21,65 @@ namespace AutoDox.UI.Models
             };
         }
 
-        public async void GetSvgFromPlantUml(string pumlPath)
+        public async Task GetSvgFromPlantUml(string pumlPath)
         {
-            DiagramGeneratorManager.Logs += $"Generating .svg from {pumlPath}...\n";
-
-            byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(pumlPath)));
-            string encodedOutput = Convert.ToBase64String(compressedBytes).Replace('+', '-').Replace('/', '_');
-
-            using HttpResponseMessage response = await client.GetAsync(encodedOutput);
-            HttpContent responseContent = response.Content;
-            string result = await responseContent.ReadAsStringAsync();
-            DiagramGeneratorManager.WriteSvg(result, Path.Combine(Path.GetDirectoryName(pumlPath),
-                                                     Path.GetFileNameWithoutExtension(pumlPath) + ".svg"));
-
-            DiagramGeneratorManager.Logs += "Jobs finished successfully.\n";
-        }
-
-        public async void GetSvgFromPlantUml(List<string> pumlPaths)
-        {
-            foreach (string path in pumlPaths)
+            try
             {
-                DiagramGeneratorManager.Logs += $"Generating .svg from {path}...\n";
+                DiagramGeneratorManager.Logs += $"Generating .svg from {pumlPath}...\n";
 
-                byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(path)));
-                string encodedOutput = Convert.ToBase64String(compressedBytes).Replace('+', '-').Replace('/', '_');
+                byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(pumlPath)));
+                string encodedOutput = Convert.ToBase64String(compressedBytes)
+                    .Replace('+', '-')
+                    .Replace('/', '_');
 
                 using HttpResponseMessage response = await client.GetAsync(encodedOutput);
                 HttpContent responseContent = response.Content;
                 string result = await responseContent.ReadAsStringAsync();
-                DiagramGeneratorManager.WriteSvg(result, Path.Combine(Path.GetDirectoryName(path),
-                                                         Path.GetFileNameWithoutExtension(path) + ".svg"));
+
+                DiagramGeneratorManager.WriteSvg(result, Path.Combine(
+                    Path.GetDirectoryName(pumlPath),
+                    Path.GetFileNameWithoutExtension(pumlPath) + ".svg"));
+
+                DiagramGeneratorManager.Logs += $"Finished processing {pumlPath}\nJobs finished successfully.\n\n";
             }
-            DiagramGeneratorManager.Logs += "Jobs finished successfully.\n";
+            catch (Exception ex)
+            {
+                DiagramGeneratorManager.Logs += $"Error processing {pumlPath}: {ex.Message}\n";
+            }            
+        }
+
+        public async Task GetSvgFromPlantUml(List<string> pumlPaths)
+        {
+            List<Task> tasks = pumlPaths.Select(async path =>
+            {
+                try
+                {
+                    DiagramGeneratorManager.Logs += $"Generating .svg from {path}...\n";
+
+                    byte[] compressedBytes = ZlibDeflate(Encoding.UTF8.GetBytes(DiagramGeneratorManager.ReadPlantUml(path)));
+                    string encodedOutput = Convert.ToBase64String(compressedBytes)
+                        .Replace('+', '-')
+                        .Replace('/', '_');
+
+                    using HttpResponseMessage response = await client.GetAsync(encodedOutput);
+                    HttpContent responseContent = response.Content;
+                    string result = await responseContent.ReadAsStringAsync();
+
+                    DiagramGeneratorManager.WriteSvg(result, Path.Combine(
+                        Path.GetDirectoryName(path),
+                        Path.GetFileNameWithoutExtension(path) + ".svg"));
+
+                    DiagramGeneratorManager.Logs += $"Finished processing {path}\n";
+                }
+                catch (Exception ex)
+                {
+                    DiagramGeneratorManager.Logs += $"Error processing {path}: {ex.Message}\n";
+                }
+            }).ToList();
+
+            await Task.WhenAll(tasks);
+
+            DiagramGeneratorManager.Logs += "All jobs finished.\n\n";
         }
 
         private static byte[] ZlibDeflate(byte[] data, CompressionLevel? level = null)
